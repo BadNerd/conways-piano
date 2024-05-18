@@ -13,7 +13,7 @@ function playnote(key){
 }
 
 // CONWAYS
-
+var generateInterval,soundInterval;
 var sizey = 17;
 var sizex = 18;
 var htmlElements;
@@ -63,9 +63,14 @@ function createField() {
 function draw() {
   for (var y = 0; y < sizey; y++) {
     for (var x = 0; x < sizex; x++) {
-      htmlElements[y][x].setAttribute('class', 'cell ' + (cells[y][x] == 1 ? 'filled' : 'empty'));
-      htmlElements[y][x].setAttribute('data-y',[y]);
-      htmlElements[y][x].setAttribute('data-x',[x]);
+        // set all keys as not active
+        keys.forEach(key => {
+            key.classList.remove("active");
+        })
+        // Giving cells attributes
+        htmlElements[y][x].setAttribute('class', 'cell ' + (cells[y][x] == 1 ? 'filled' : 'empty'));
+        htmlElements[y][x].setAttribute('data-y',[y]);
+        htmlElements[y][x].setAttribute('data-x',[x]);
 
     }
   }
@@ -103,15 +108,24 @@ function newGeneration() {
   draw();
 }
 function playcell(){
+
+
     for(var y = 0; y < sizey; y++){
         for(var x = 0;x < sizex;x++){
             if(cells[y][x] == ALIVE){
                 var note = document.getElementById(cellNote[y][x]);
                 note.currentTime = 0;
                 note.play();
+                // Change key background color
+                keys.forEach(key => {
+                    if(key.dataset.key == cellNote[y][x]){
+                        key.classList.add("active");
+                    }
+                })
               }
         }
     }
+
 }
 function init() {
   createField();
@@ -131,12 +145,13 @@ function init() {
     })
     console.log(cellElements);
 }
-var a;
+
 play.addEventListener("click", () => {
-    a = setInterval(newGeneration, 500);
-    setInterval(playcell,510);
+    generateInterval = setInterval(newGeneration, 500);
+    soundInterval = setInterval(playcell,510);
 })
 stop.addEventListener("click", () => {
-    clearInterval(a);
+    clearInterval(generateInterval);
+    clearInterval(soundInterval);
 })
 init();
